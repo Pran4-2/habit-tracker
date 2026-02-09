@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .date {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        .habits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .habit-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .habit-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .habit-item.completed {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .habit-checkbox {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .habit-name {
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        .habit-item.completed .habit-name {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .habit-xp {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        .progress-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .celebration {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            animation: celebration-pulse 2s infinite;
+            display: none;
+        }
+
+        .celebration.show {
+            display: block;
+        }
+
+        @keyframes celebration-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .settings-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .settings-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .settings-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .settings-option label {
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .habit-item {
+                flex-wrap: wrap;
+            }
+
+            .habit-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 Habit Tracker</h1>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="label">Today's Progress</div>
+                <div class="value" id="todayProgress">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Current Streak</div>
+                <div class="value" id="currentStreak">0 days</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Weekly Score</div>
+                <div class="value" id="weeklyScore">0 XP</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Monthly Score</div>
+                <div class="value" id="monthlyScore">0 XP</div>
+            </div>
+        </div>
+
+        <!-- Celebration Message -->
+        <div class="celebration" id="celebration"></div>
+
+        <!-- Daily Progress -->
+        <div class="section progress-section">
+            <div class="section-title">Daily Progress</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="progress-text" id="progressText">Complete your habits to earn XP!</div>
+        </div>
+
+        <!-- Daily Habits Checklist -->
+        <div class="section">
+            <div class="section-title">
+                Today's Habits
+                <button class="btn btn-primary btn-small" onclick="showAddHabitModal()">+ Add Habit</button>
+            </div>
+            <div class="habits-list" id="habitsList"></div>
+        </div>
+
+        <!-- Settings -->
+        <div class="section settings-section">
+            <div class="section-title">Settings</div>
+            <div class="settings-option">
+                <input type="checkbox" id="includeWeekendsToggle" onchange="toggleWeekends()">
+                <label for="includeWeekendsToggle">Include weekends in weekly score</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Habit Modal -->
+    <div class="modal" id="habitModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add New Habit</div>
+            <form onsubmit="saveHabit(event)">
+                <div class="form-group">
+                    <label for="habitName">Habit Name</label>
+                    <input type="text" id="habitName" required placeholder="e.g., Morning Exercise">
+                </div>
+                <div class="form-group">
+                    <label for="habitXP">XP Points (1-100)</label>
+                    <input type="number" id="habitXP" min="1" max="100" value="10" required>
+                </div>
+                <input type="hidden" id="editingHabitId">
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage Keys
+        const STORAGE_KEYS = {
+            HABITS: 'habitTracker_habits',
+            DAILY_LOGS: 'habitTracker_dailyLogs',
+            SETTINGS: 'habitTracker_settings',
+            STREAK: 'habitTracker_streak'
+        };
+
+        // Initialize data
+        let habits = [];
+        let dailyLogs = {};
+        let settings = {
+            includeWeekends: false
+        };
+        let streakData = {
+            currentStreak: 0,
+            longestStreak: 0,
+            lastCompletedDate: null
+        };
+
+        // Initialize app
+        function init() {
+            loadData();
+            renderCurrentDate();
+            renderHabits();
+            updateAllStats();
+            checkCelebrations();
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const habitsData = localStorage.getItem(STORAGE_KEYS.HABITS);
+            const logsData = localStorage.getItem(STORAGE_KEYS.DAILY_LOGS);
+            const settingsData = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+            const streakDataStore = localStorage.getItem(STORAGE_KEYS.STREAK);
+
+            if (habitsData) habits = JSON.parse(habitsData);
+            if (logsData) dailyLogs = JSON.parse(logsData);
+            if (settingsData) settings = JSON.parse(settingsData);
+            if (streakDataStore) streakData = JSON.parse(streakDataStore);
+
+            // Initialize with default habits if none exist
+            if (habits.length === 0) {
+                habits = [
+                    { id: generateId(), name: 'Morning Exercise', xp: 15, active: true },
+                    { id: generateId(), name: 'Read for 30 minutes', xp: 10, active: true },
+                    { id: generateId(), name: 'Drink 8 glasses of water', xp: 10, active: true }
+                ];
+                saveData();
+            }
+
+            // Update settings UI
+            document.getElementById('includeWeekendsToggle').checked = settings.includeWeekends;
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
+            localStorage.setItem(STORAGE_KEYS.DAILY_LOGS, JSON.stringify(dailyLogs));
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+            localStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streakData));
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return 'habit_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Get today's date in YYYY-MM-DD format
+        function getTodayString() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // Render current date
+        function renderCurrentDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        // Render habits list
+        function renderHabits() {
+            const habitsList = document.getElementById('habitsList');
+            const today = getTodayString();
+            const todayLog = dailyLogs[today] || { completedHabits: [] };
+
+            if (habits.length === 0) {
+                habitsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div>No habits yet. Click "Add Habit" to get started!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            habitsList.innerHTML = habits.map(habit => {
+                const isCompleted = todayLog.completedHabits.includes(habit.id);
+                return `
+                    <div class="habit-item ${isCompleted ? 'completed' : ''}" data-habit-id="${habit.id}">
+                        <input type="checkbox" 
+                               class="habit-checkbox" 
+                               ${isCompleted ? 'checked' : ''} 
+                               onchange="toggleHabit('${habit.id}')">
+                        <span class="habit-name">${habit.name}</span>
+                        <span class="habit-xp">${habit.xp} XP</span>
+                        <div class="habit-actions">
+                            <button class="btn btn-secondary btn-small" onclick="editHabit('${habit.id}')">Edit</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteHabit('${habit.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle habit completion
+        function toggleHabit(habitId) {
+            const today = getTodayString();
+            if (!dailyLogs[today]) {
+                dailyLogs[today] = { completedHabits: [], totalXP: 0, possibleXP: 0 };
+            }
+
+            const todayLog = dailyLogs[today];
+            const index = todayLog.completedHabits.indexOf(habitId);
+
+            if (index > -1) {
+                todayLog.completedHabits.splice(index, 1);
+            } else {
+                todayLog.completedHabits.push(habitId);
+            }
+
+            saveData();
+            renderHabits();
+            updateAllStats();
+            checkCelebrations();
+        }
+
+        // Calculate daily progress
+        function calculateDailyProgress() {
+            const today = getTodayString();
+            const todayLog = dailyLogs[today] || { completedHabits: [] };
+            
+            let totalXP = 0;
+            let earnedXP = 0;
+
+            habits.forEach(habit => {
+                totalXP += habit.xp;
+                if (todayLog.completedHabits.includes(habit.id)) {
+                    earnedXP += habit.xp;
+                }
+            });
+
+            const percentage = totalXP > 0 ? Math.round((earnedXP / totalXP) * 100) : 0;
+            return { percentage, earnedXP, totalXP };
+        }
+
+        // Calculate weekly score
+        function calculateWeeklyScore() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            // Calculate Monday of current week
+            const monday = new Date(today);
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            monday.setDate(diff);
+            monday.setHours(0, 0, 0, 0);
+
+            let totalXP = 0;
+            const endDay = settings.includeWeekends ? 7 : 5;
+
+            for (let i = 0; i < endDay; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                if (dailyLogs[dateStr]) {
+                    const log = dailyLogs[dateStr];
+                    log.completedHabits.forEach(habitId => {
+                        const habit = habits.find(h => h.id === habitId);
+                        if (habit) totalXP += habit.xp;
+                    });
+                }
+            }
+
+            return totalXP;
+        }
+
+        // Calculate monthly score
+        function calculateMonthlyScore() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            
+            let totalXP = 0;
+            let daysCompleted = 0;
+
+            Object.keys(dailyLogs).forEach(dateStr => {
+                const date = new Date(dateStr);
+                if (date.getFullYear() === year && date.getMonth() === month) {
+                    const log = dailyLogs[dateStr];
+                    if (log.completedHabits.length > 0) {
+                        daysCompleted++;
+                        log.completedHabits.forEach(habitId => {
+                            const habit = habits.find(h => h.id === habitId);
+                            if (habit) totalXP += habit.xp;
+                        });
+                    }
+                }
+            });
+
+            return { totalXP, daysCompleted };
+        }
+
+        // Calculate streak
+        function calculateStreak() {
+            const dates = Object.keys(dailyLogs).sort().reverse();
+            let streak = 0;
+            let checkDate = new Date();
+            checkDate.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < 365; i++) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                const log = dailyLogs[dateStr];
+
+                if (!log || log.completedHabits.length === 0) {
+                    // Allow skipping today if no habits completed yet
+                    if (i === 0) {
+                        checkDate.setDate(checkDate.getDate() - 1);
+                        continue;
+                    }
+                    break;
+                }
+
+                // Calculate percentage completed
+                let totalXP = 0;
+                let earnedXP = 0;
+                habits.forEach(habit => {
+                    totalXP += habit.xp;
+                    if (log.completedHabits.includes(habit.id)) {
+                        earnedXP += habit.xp;
+                    }
+                });
+
+                const percentage = totalXP > 0 ? (earnedXP / totalXP) * 100 : 0;
+                
+                // Streak continues if 80%+ completed
+                if (percentage >= 80) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+
+            streakData.currentStreak = streak;
+            if (streak > streakData.longestStreak) {
+                streakData.longestStreak = streak;
+            }
+            
+            return streak;
+        }
+
+        // Update all statistics
+        function updateAllStats() {
+            // Daily progress
+            const daily = calculateDailyProgress();
+            document.getElementById('todayProgress').textContent = daily.percentage + '%';
+            document.getElementById('progressBar').style.width = daily.percentage + '%';
+            document.getElementById('progressBar').textContent = daily.percentage + '%';
+            document.getElementById('progressText').textContent = 
+                `${daily.earnedXP} / ${daily.totalXP} XP earned today`;
+
+            // Streak
+            const streak = calculateStreak();
+            document.getElementById('currentStreak').textContent = streak + ' days';
+
+            // Weekly score
+            const weeklyXP = calculateWeeklyScore();
+            document.getElementById('weeklyScore').textContent = weeklyXP + ' XP';
+
+            // Monthly score
+            const monthly = calculateMonthlyScore();
+            document.getElementById('monthlyScore').textContent = monthly.totalXP + ' XP';
+
+            saveData();
+        }
+
+        // Check for celebrations
+        function checkCelebrations() {
+            const daily = calculateDailyProgress();
+            const streak = streakData.currentStreak;
+            const celebrationEl = document.getElementById('celebration');
+            let message = '';
+
+            // Daily completion
+            if (daily.percentage === 100) {
+                message = '🎉 Amazing! You completed all your habits today! Keep it up!';
+            }
+            // Streak milestones
+            else if (streak === 7) {
+                message = '🔥 7 Day Streak! You\'re on fire!';
+            } else if (streak === 14) {
+                message = '💪 2 Week Streak! Incredible dedication!';
+            } else if (streak === 30) {
+                message = '🏆 30 Day Streak! You\'re a habit master!';
+            } else if (streak === 60) {
+                message = '⭐ 60 Day Streak! Absolutely legendary!';
+            } else if (streak === 90) {
+                message = '👑 90 Day Streak! You\'re unstoppable!';
+            }
+
+            if (message) {
+                celebrationEl.textContent = message;
+                celebrationEl.classList.add('show');
+            } else {
+                celebrationEl.classList.remove('show');
+            }
+        }
+
+        // Show add habit modal
+        function showAddHabitModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Habit';
+            document.getElementById('habitName').value = '';
+            document.getElementById('habitXP').value = '10';
+            document.getElementById('editingHabitId').value = '';
+            document.getElementById('habitModal').classList.add('show');
+        }
+
+        // Edit habit
+        function editHabit(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Habit';
+            document.getElementById('habitName').value = habit.name;
+            document.getElementById('habitXP').value = habit.xp;
+            document.getElementById('editingHabitId').value = habitId;
+            document.getElementById('habitModal').classList.add('show');
+        }
+
+        // Save habit (add or edit)
+        function saveHabit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('habitName').value;
+            const xp = parseInt(document.getElementById('habitXP').value);
+            const editingId = document.getElementById('editingHabitId').value;
+
+            if (editingId) {
+                // Edit existing habit
+                const habit = habits.find(h => h.id === editingId);
+                if (habit) {
+                    habit.name = name;
+                    habit.xp = xp;
+                }
+            } else {
+                // Add new habit
+                habits.push({
+                    id: generateId(),
+                    name: name,
+                    xp: xp,
+                    active: true
+                });
+            }
+
+            saveData();
+            closeModal();
+            renderHabits();
+            updateAllStats();
+        }
+
+        // Delete habit
+        function deleteHabit(habitId) {
+            if (!confirm('Are you sure you want to delete this habit?')) return;
+
+            habits = habits.filter(h => h.id !== habitId);
+            
+            // Remove from all daily logs
+            Object.keys(dailyLogs).forEach(date => {
+                const log = dailyLogs[date];
+                log.completedHabits = log.completedHabits.filter(id => id !== habitId);
+            });
+
+            saveData();
+            renderHabits();
+            updateAllStats();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('habitModal').classList.remove('show');
+        }
+
+        // Toggle weekends
+        function toggleWeekends() {
+            settings.includeWeekends = document.getElementById('includeWeekendsToggle').checked;
+            saveData();
+            updateAllStats();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('habitModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

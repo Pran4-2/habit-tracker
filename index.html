@@ -464,6 +464,12 @@
             STREAK: 'habitTracker_streak'
         };
 
+        // Configuration Constants
+        const CONFIG = {
+            STREAK_THRESHOLD_PERCENTAGE: 80,  // Minimum completion % to maintain streak
+            MAX_STREAK_LOOKBACK_DAYS: 365     // Maximum days to look back for streak calculation
+        };
+
         // Initialize data
         let habits = [];
         let dailyLogs = {};
@@ -676,7 +682,7 @@
             let checkDate = new Date();
             checkDate.setHours(0, 0, 0, 0);
 
-            for (let i = 0; i < 365; i++) {
+            for (let i = 0; i < CONFIG.MAX_STREAK_LOOKBACK_DAYS; i++) {
                 const dateStr = checkDate.toISOString().split('T')[0];
                 const log = dailyLogs[dateStr];
 
@@ -701,8 +707,8 @@
 
                 const percentage = totalXP > 0 ? (earnedXP / totalXP) * 100 : 0;
                 
-                // Streak continues if 80%+ completed
-                if (percentage >= 80) {
+                // Streak continues if threshold percentage is met
+                if (percentage >= CONFIG.STREAK_THRESHOLD_PERCENTAGE) {
                     streak++;
                     checkDate.setDate(checkDate.getDate() - 1);
                 } else {
